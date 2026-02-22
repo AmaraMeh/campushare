@@ -1,6 +1,6 @@
 name: localsend_app
-description: An open source cross-platform alternative to AirDrop
-homepage: https://localsend.org/
+description: Campus Share - Share files and messages with nearby devices on your local network
+homepage: https://github.com/amaramehdi/campus-share
 publish_to: "none"
 
 version: 1.17.0+58

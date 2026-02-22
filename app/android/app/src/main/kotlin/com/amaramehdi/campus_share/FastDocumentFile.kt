@@ -1,4 +1,4 @@
-package org.localsend.localsend_app
+package com.amaramehdi.campus_share
 
 import android.content.ContentResolver
 import android.content.Context

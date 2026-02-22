@@ -31,16 +31,16 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 20),
           const LocalSendLogo(withText: true),
           Text(
-            '© ${DateTime.now().year} Tien Do Nam',
+            '© 2026 Amara Mehdi',
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
           Center(
             child: TextButton(
               onPressed: () async {
-                await launchUrl(Uri.parse('https://localsend.org'));
+                await launchUrl(Uri.parse('https://github.com/amaramehdi/campus-share'));
               },
-              child: const Text('localsend.org'),
+              child: const Text('Campus Share'),
             ),
           ),
           const SizedBox(height: 10),
@@ -49,7 +49,7 @@ class AboutPage extends StatelessWidget {
           Text(t.aboutPage.author, style: const TextStyle(fontWeight: FontWeight.bold)),
           Text.rich(
             _buildContributor(
-              label: 'Tien Do Nam (@Tienisto)',
+              label: 'Amara Mehdi',
               primaryColor: primaryColor,
             ),
           ),

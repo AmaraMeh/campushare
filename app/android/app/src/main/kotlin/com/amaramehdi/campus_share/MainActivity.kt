@@ -1,4 +1,4 @@
-package org.localsend.localsend_app
+package com.amaramehdi.campus_share
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -13,8 +13,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-
-private const val CHANNEL = "org.localsend.localsend_app/localsend"
+private const val CHANNEL = "com.amaramehdi.campus_share/localsend"
 private const val REQUEST_CODE_PICK_DIRECTORY = 1
 private const val REQUEST_CODE_PICK_DIRECTORY_PATH = 2
 private const val REQUEST_CODE_PICK_FILE = 3
@@ -22,8 +21,6 @@ private const val REQUEST_CODE_PICK_FILE = 3
 class MainActivity : FlutterActivity() {
     private var pendingResult: MethodChannel.Result? = null
 
-    // Overriding the static methods we need from the Java class, as described
-    // in the documentation of `FlutterActivity.NewEngineIntentBuilder`
     companion object {
         fun withNewEngine(): NewEngineIntentBuilder {
             return NewEngineIntentBuilder(MainActivity::class.java)
@@ -45,41 +42,32 @@ class MainActivity : FlutterActivity() {
                     pendingResult = result
                     openDirectoryPicker(onlyPath = false)
                 }
-
                 "pickFiles" -> {
                     pendingResult = result
                     openFilePicker()
                 }
-
                 "pickDirectoryPath" -> {
                     pendingResult = result
                     openDirectoryPicker(onlyPath = true)
                 }
-
                 "createDirectory" -> handleCreateDirectory(call, result)
-
                 "openContentUri" -> {
                     openUri(context, call.argument<String>("uri")!!)
                     result.success(null)
                 }
-
                 "openGallery" -> {
                     openGallery()
                     result.success(null)
                 }
-
-                "isAnimationsEnabled" -> {
-                    result.success(isAnimationsEnabled())
-                }
-
+                "isAnimationsEnabled" -> result.success(isAnimationsEnabled())
                 else -> result.notImplemented()
             }
         }
     }
 
-    private fun isAnimationsEnabled() : Boolean {
+    private fun isAnimationsEnabled(): Boolean {
         return Settings.Global.getFloat(this.getContentResolver(),
-            Settings.Global.ANIMATOR_DURATION_SCALE, 1.0f) != 0.0f;
+            Settings.Global.ANIMATOR_DURATION_SCALE, 1.0f) != 0.0f
     }
 
     private fun openDirectoryPicker(onlyPath: Boolean) {
@@ -111,13 +99,11 @@ class MainActivity : FlutterActivity() {
             pendingResult = null
             return
         }
-
         if (resultCode != Activity.RESULT_OK || data == null) {
             pendingResult?.error("Error $resultCode", "Failed to access directory or file", null)
             pendingResult = null
             return
         }
-
         when (requestCode) {
             REQUEST_CODE_PICK_DIRECTORY -> {
                 val uri: Uri? = data.data
@@ -125,7 +111,6 @@ class MainActivity : FlutterActivity() {
                     data.flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                 if (uri != null) {
                     contentResolver.takePersistableUriPermission(uri, takeFlags)
-
                     val files = mutableListOf<FileInfo>()
                     listFiles(uri, files)
                     val resultData = PickDirectoryResult(uri.toString(), files)
@@ -136,7 +121,6 @@ class MainActivity : FlutterActivity() {
                     pendingResult = null
                 }
             }
-
             REQUEST_CODE_PICK_DIRECTORY_PATH -> {
                 val uri: Uri? = data.data
                 val takeFlags: Int =
@@ -150,7 +134,6 @@ class MainActivity : FlutterActivity() {
                     pendingResult = null
                 }
             }
-
             REQUEST_CODE_PICK_FILE -> {
                 val uriList: List<Uri> = when {
                     data.clipData != null -> {
@@ -161,17 +144,14 @@ class MainActivity : FlutterActivity() {
                         }
                         uris
                     }
-
                     data.data != null -> listOf(data.data!!)
                     else -> {
                         pendingResult?.error("Error", "Failed to access file", null)
                         return
                     }
                 }
-
                 val takeFlags: Int =
                     data.flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
                 val resultList = mutableListOf<FileInfo>()
                 for (uri in uriList) {
                     contentResolver.takePersistableUriPermission(uri, takeFlags)
@@ -189,7 +169,6 @@ class MainActivity : FlutterActivity() {
                         )
                     )
                 }
-
                 pendingResult?.success(resultList.map { it.toMap() })
                 pendingResult = null
             }
@@ -198,10 +177,8 @@ class MainActivity : FlutterActivity() {
 
     private fun listFiles(uri: Uri, files: MutableList<FileInfo>) {
         val pickedDir: FastDocumentFile = FastDocumentFile.fromTreeUri(this, uri)
-
         for (file in pickedDir.listFiles()) {
             if (file.isDirectory) {
-                // Recursive call
                 listFiles(file.uri, files)
             } else if (file.isFile) {
                 files.add(
@@ -220,17 +197,14 @@ class MainActivity : FlutterActivity() {
     private fun handleCreateDirectory(call: MethodCall, result: MethodChannel.Result) {
         val documentUri = Uri.parse(call.argument<String>("documentUri")!!)
         val directoryName = call.argument<String>("directoryName")!!
-
         if (folderExists(documentUri, directoryName)) {
             result.success(null)
             return
         }
-
         DocumentsContract.createDocument(
             context.contentResolver, documentUri, DocumentsContract.Document.MIME_TYPE_DIR,
             directoryName
         )
-
         result.success(null)
     }
 
@@ -244,16 +218,12 @@ class MainActivity : FlutterActivity() {
                     DocumentsContract.Document.COLUMN_DISPLAY_NAME,
                     DocumentsContract.Document.COLUMN_MIME_TYPE
                 ),
-                null,
-                null,
-                null,
+                null, null, null,
             )
-
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     val displayName = cursor.getString(0)
                     val mimeType = cursor.getString(1)
-
                     if (folderName == displayName && DocumentsContract.Document.MIME_TYPE_DIR == mimeType) {
                         return true
                     }
